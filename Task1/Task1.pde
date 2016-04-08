@@ -5,7 +5,7 @@ Minim minim;
 AudioPlayer song;
 AudioMetaData metaInfo; 
 CustomLowPass effect;
-PFont font;
+PFont font, altFont;
 int bufferSize;
 int currentColor;
 Boolean showMetaInfo;
@@ -29,13 +29,14 @@ class CustomLowPass implements AudioEffect {
 }
 
 void setup() {
-  size(800, 600, P3D);
+  size(800, 600);
   minim = new Minim(this);
   song = minim.loadFile("01 PCM Rock Sample.mp3");
   effect = new CustomLowPass(0.075);
   song.addEffect(effect);
   metaInfo = song.getMetaData();
   font = createFont("Sans-Serif", 12);
+  altFont = createFont("Sans-Serif", 50);
   textFont(font);
   showMetaInfo = true;
   bufferSize = song.bufferSize();
@@ -49,7 +50,7 @@ void draw() {
   translate(400, 300);
   if(!song.isPlaying()) {
    fill(255);
-   textFont(createFont("Sans-Serif", 50));
+   textFont(altFont);
    text("SONG PAUSED. PRESS P TO PLAY",0,300,400,300);
    textFont(font);
   }
