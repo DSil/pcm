@@ -5,7 +5,9 @@ Minim minim;
 AudioPlayer song;
 AudioMetaData metaInfo; 
 CustomLowPass effect;
+PFont font;
 int bufferSize;
+int currentColor;
 Boolean showMetaInfo;
 
 class CustomLowPass implements AudioEffect {
@@ -33,21 +35,40 @@ void setup() {
   effect = new CustomLowPass(0.075);
   song.addEffect(effect);
   metaInfo = song.getMetaData();
-  textFont(createFont("Sans-Serif", 12));
+  font = createFont("Sans-Serif", 12);
+  textFont(font);
   showMetaInfo = true;
-  song.play();
   bufferSize = song.bufferSize();
+  rectMode(RADIUS);
+  currentColor = 0xFFFF0000;
 }
 
 void draw() {
   background(0);
-  stroke(100, 200, 255);
-  for (int i = 0; i < bufferSize - 1; i++) {
-    line(i, 50 + song.left.get(i) * 100, i+1, 50 + song.left.get(i+1) * 100);
-    line(i, 150 + song.right.get(i) * 100, i+1, 150 + song.right.get(i+1) * 100);
+  pushMatrix();
+  translate(400, 300);
+  if(!song.isPlaying()) {
+   fill(255);
+   textFont(createFont("Sans-Serif", 50));
+   text("SONG PAUSED. PRESS P TO PLAY",0,300,400,300);
+   textFont(font);
   }
+  fill(currentColor);
+  for (int i = 0; i < bufferSize - 50; i+=50) {
+      for(int j = 0; j < 50; j+=2) {
+        pushMatrix();
+          translate(-10 * j, 0);
+          rect(0, 0, 5, song.left.get(i+j)*100,2);
+        popMatrix();
+        pushMatrix();
+          translate(10 * j, 0);
+          rect(0, 0, 5, song.right.get(i+j)*100,2);
+        popMatrix();
+     }
+  }
+  popMatrix();
   if (showMetaInfo) {
-     displayMetaInfo(); 
+     displayMetaInfo();
   }
 }
 
@@ -58,6 +79,8 @@ void stop() {
 }
 
 void displayMetaInfo() {
+  pushMatrix();
+  fill(255,255,255);
   int yi = 15;
   int y = 25;
   text("File Name: " + metaInfo.fileName(), 5, y);
@@ -65,6 +88,7 @@ void displayMetaInfo() {
   text("Title: " + metaInfo.title(), 5, y+=yi);
   text("Author: " + metaInfo.author(), 5, y+=yi); 
   text("Album: " + metaInfo.album(), 5, y+=yi);
+  popMatrix();
 }
   
 
@@ -77,7 +101,18 @@ void keyPressed() {
       song.mute();
     }
   }
-  if(key == 'i') {
-    showMetaInfo = !showMetaInfo;
+  if(key == 'p') {
+   if(song.isPlaying())
+    song.pause();
+   else
+    song.play();   
   }
+  else if(key == 'i')
+    showMetaInfo = !showMetaInfo;
+  else if(key == 'r')
+    currentColor = 0xFFFF0000;
+  else if(key == 'g')
+    currentColor = 0xFF00FF00;
+  else if(key == 'b')
+    currentColor = 0xFF0000FF;
 }
