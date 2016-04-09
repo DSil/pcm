@@ -8,7 +8,9 @@ CustomLowPass effect;
 PFont font, altFont;
 int bufferSize;
 int currentColor;
+float initialGain;
 Boolean showMetaInfo;
+Boolean muted;
 
 class CustomLowPass implements AudioEffect {
   private float freq;
@@ -35,10 +37,12 @@ void setup() {
   effect = new CustomLowPass(0.075);
   song.addEffect(effect);
   metaInfo = song.getMetaData();
+  initialGain = song.getGain();
   font = createFont("Sans-Serif", 12);
   altFont = createFont("Sans-Serif", 50);
   textFont(font);
   showMetaInfo = true;
+  muted = false;
   bufferSize = song.bufferSize();
   rectMode(RADIUS);
   currentColor = 0xFFFF0000;
@@ -95,11 +99,13 @@ void displayMetaInfo() {
 
 void keyPressed() {
   if(key == 'm') {
-    if (song.isMuted()) {
-      song.unmute();
+    if (muted) {
+      fadeIn(song, 5);
+      muted = false;
     }
     else {
-      song.mute();
+      fadeOut(song, 5);
+      muted = true;
     }
   }
   if(key == 'p') {
@@ -116,4 +122,23 @@ void keyPressed() {
     currentColor = 0xFF00FF00;
   else if(key == 'b')
     currentColor = 0xFF0000FF;
+}
+
+
+void fadeIn(AudioPlayer song, int duration){
+  float gain = song.getGain();
+  song.shiftGain(gain, initialGain, duration*1000);
+  
+}
+
+/*
+Param:
+  - song: AudioPlayer with song loaded;
+  - beginTime: Time in seconds at the fadeOut starts;
+  - durantion: duration in seconds of the fadeOut.
+*/
+
+void fadeOut(AudioPlayer song, int duration){
+    float gain = song.getGain();
+    song.shiftGain(gain, -100, duration*1000);
 }
