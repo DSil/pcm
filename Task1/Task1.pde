@@ -4,6 +4,7 @@ import java.util.List.*;
 
 Minim minim;
 AudioPlayer song;
+AudioSample sample;
 AudioMetaData metaInfo; 
 CustomLowPass effect;
 PFont font, altFont;
@@ -34,7 +35,8 @@ class CustomLowPass implements AudioEffect {
 void setup() {
   size(800, 600);
   minim = new Minim(this);
-  song = minim.loadFile("01 PCM Rock Sample.mp3");
+  song = minim.loadFile("heybrother.mp3");
+  sample = minim.loadSample("heybrother.mp3", song.bufferSize());
   effect = new CustomLowPass(0.075);
   song.addEffect(effect);
   metaInfo = song.getMetaData();
@@ -47,7 +49,7 @@ void setup() {
   multiColor = false;
   bufferSize = song.bufferSize();
   rectMode(RADIUS);
-  currentColor = 0;
+  currentColor = 0; 
 }
 
 void draw() {
@@ -135,6 +137,8 @@ void keyPressed() {
     currentColor = 2;
   else if(key == 'c')
     multiColor = !multiColor;
+  else if(key == 'd'){
+    sample.trigger(); revert();}
 }
 
 
@@ -154,4 +158,27 @@ Param:
 void fadeOut(AudioPlayer song, int duration){
     float gain = song.getGain();
     song.shiftGain(gain, -100, duration*1000);
+}
+
+
+void revert() {
+  /* sample is an AudioSample, created in setup() */
+  float[] leftChannel = sample.getChannel(AudioSample.LEFT);
+  float[] rightChannel = sample.getChannel(AudioSample.RIGHT);
+
+  float[] leftReversed = new float[leftChannel.length];
+  float[] rightReversed = new float[rightChannel.length];
+
+  int size = leftChannel.length-1;
+
+  /*inverts the array*/
+  for(int i=0; i<=size; i++){
+    leftReversed[i] = leftChannel[size-i];
+    rightReversed[i] = rightChannel[size-i];
+  }
+  /*copies it to the original array*/
+  for(int i=0; i<size; i++){
+    leftChannel[i] = leftReversed[i];
+    rightChannel[i] = rightReversed[i];
+  }  
 }
