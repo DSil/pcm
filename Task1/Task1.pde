@@ -1,5 +1,6 @@
 import ddf.minim.*;
 import ddf.minim.effects.*;
+import java.util.List.*;
 
 Minim minim;
 AudioPlayer song;
@@ -8,9 +9,9 @@ CustomLowPass effect;
 PFont font, altFont;
 int bufferSize;
 int currentColor;
+int[] colors = {0xFFFF0000, 0xFF00FF00, 0xFF0000FF};
 float initialGain;
-Boolean showMetaInfo;
-Boolean muted;
+Boolean showMetaInfo, muted, multiColor;
 
 class CustomLowPass implements AudioEffect {
   private float freq;
@@ -43,9 +44,10 @@ void setup() {
   textFont(font);
   showMetaInfo = true;
   muted = false;
+  multiColor = false;
   bufferSize = song.bufferSize();
   rectMode(RADIUS);
-  currentColor = 0xFFFF0000;
+  currentColor = 0;
 }
 
 void draw() {
@@ -58,7 +60,7 @@ void draw() {
    text("SONG PAUSED. PRESS P TO PLAY",0,300,400,300);
    textFont(font);
   }
-  fill(currentColor);
+  fill(colors[currentColor]);
   for (int i = 0; i < bufferSize - 50; i+=50) {
       for(int j = 0; j < 50; j+=2) {
         pushMatrix();
@@ -70,6 +72,9 @@ void draw() {
           rect(0, 0, 5, song.right.get(i+j)*100,2);
         popMatrix();
      }
+     if(i==50)
+       if(multiColor)
+        currentColor = (currentColor + 1) % colors.length;
   }
   popMatrix();
   if (showMetaInfo) {
@@ -108,20 +113,28 @@ void keyPressed() {
       muted = true;
     }
   }
-  if(key == 'p') {
+  else if(key == 'p') {
    if(song.isPlaying())
     song.pause();
    else
     song.play();   
   }
+  else if(key == 'f') {
+    if(song.isEffected()) //Only works with one effect
+      song.disableEffect(effect);
+    else
+      song.enableEffect(effect);
+  }
   else if(key == 'i')
     showMetaInfo = !showMetaInfo;
   else if(key == 'r')
-    currentColor = 0xFFFF0000;
+    currentColor = 0;
   else if(key == 'g')
-    currentColor = 0xFF00FF00;
+    currentColor = 1;
   else if(key == 'b')
-    currentColor = 0xFF0000FF;
+    currentColor = 2;
+  else if(key == 'c')
+    multiColor = !multiColor;
 }
 
 
