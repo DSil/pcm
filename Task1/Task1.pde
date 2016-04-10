@@ -35,10 +35,11 @@ class CustomLowPass implements AudioEffect {
 void setup() {
   size(800, 600);
   minim = new Minim(this);
-  song = minim.loadFile("heybrother.mp3");
-  sample = minim.loadSample("heybrother.mp3", song.bufferSize());
+  song = minim.loadFile("01 PCM Rock Sample.mp3");
+  sample = minim.loadSample("01 PCM Rock Sample.mp3", song.bufferSize());
   effect = new CustomLowPass(0.075);
   song.addEffect(effect);
+  song.disableEffect(effect);
   metaInfo = song.getMetaData();
   initialGain = song.getGain();
   font = createFont("Sans-Serif", 12);
@@ -138,7 +139,9 @@ void keyPressed() {
   else if(key == 'c')
     multiColor = !multiColor;
   else if(key == 'd'){
-    sample.trigger(); revert();}
+    sample.trigger();
+    revert();
+  }
 }
 
 
