@@ -12,7 +12,7 @@ int bufferSize;
 int currentColor;
 int[] colors = {0xFFFF0000, 0xFF00FF00, 0xFF0000FF};
 float initialGain;
-Boolean showMetaInfo, muted, multiColor;
+Boolean showMetaInfo, muted, multiColor, reversed;
 
 class CustomLowPass implements AudioEffect {
   private float freq;
@@ -51,33 +51,54 @@ void setup() {
   bufferSize = song.bufferSize();
   rectMode(RADIUS);
   currentColor = 0; 
+  revert();
+  reversed = false;
 }
 
 void draw() {
   background(0);
   pushMatrix();
   translate(400, 300);
-  if(!song.isPlaying()) {
+  if(!song.isPlaying() && !reversed) {
    fill(255);
    textFont(altFont);
    text("SONG PAUSED. PRESS P TO PLAY",0,300,400,300);
    textFont(font);
   }
   fill(colors[currentColor]);
-  for (int i = 0; i < bufferSize - 50; i+=50) {
-      for(int j = 0; j < 50; j+=2) {
-        pushMatrix();
-          translate(-10 * j, 0);
-          rect(0, 0, 5, song.left.get(i+j)*100,2);
-        popMatrix();
-        pushMatrix();
-          translate(10 * j, 0);
-          rect(0, 0, 5, song.right.get(i+j)*100,2);
-        popMatrix();
-     }
-     if(i==50)
-       if(multiColor)
-        currentColor = (currentColor + 1) % colors.length;
+  if(reversed) {
+    for (int i = 0; i < bufferSize - 50; i+=50) {
+        for(int j = 0; j < 50; j+=2) {
+          pushMatrix();
+            translate(-10 * j, 0);
+            rect(0, 0, 5, sample.left.get(i+j)*100,2);
+          popMatrix();
+          pushMatrix();
+            translate(10 * j, 0);
+            rect(0, 0, 5, sample.right.get(i+j)*100,2);
+          popMatrix();
+       }
+       if(i==50)
+         if(multiColor)
+          currentColor = (currentColor + 1) % colors.length;
+    }
+  }
+  else {
+    for (int i = 0; i < bufferSize - 50; i+=50) {
+        for(int j = 0; j < 50; j+=2) {
+          pushMatrix();
+            translate(-10 * j, 0);
+            rect(0, 0, 5, song.left.get(i+j)*100,2);
+          popMatrix();
+          pushMatrix();
+            translate(10 * j, 0);
+            rect(0, 0, 5, song.right.get(i+j)*100,2);
+          popMatrix();
+       }
+       if(i==50)
+         if(multiColor)
+          currentColor = (currentColor + 1) % colors.length;
+    }
   }
   popMatrix();
   if (showMetaInfo) {
@@ -117,10 +138,12 @@ void keyPressed() {
     }
   }
   else if(key == 'p') {
-   if(song.isPlaying())
-    song.pause();
-   else
-    song.play();   
+   if(!reversed) {
+     if(song.isPlaying())
+      song.pause();
+     else
+      song.play(); 
+   }  
   }
   else if(key == 'f') {
     if(song.isEffected()) //Only works with one effect
@@ -138,9 +161,17 @@ void keyPressed() {
     currentColor = 2;
   else if(key == 'c')
     multiColor = !multiColor;
-  else if(key == 'd'){
-    sample.trigger();
-    revert();
+  else if(key == 'd'){    
+    if(song.isPlaying()){ 
+      sample.trigger();
+      song.pause();
+      reversed = true;
+    }
+    else {
+      song.play();
+      sample.stop();
+      reversed = false;
+    }
   }
 }
 
