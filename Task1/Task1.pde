@@ -10,7 +10,7 @@ CustomLowPass effect;
 PFont font, altFont;
 int bufferSize;
 int currentColor;
-int[] colors = {0xFFFF0000, 0xFF00FF00, 0xFF0000FF};
+int[] colors = {0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFFEAEBE3};
 float initialGain;
 Boolean showMetaInfo, muted, multiColor, reversed;
 
@@ -159,6 +159,8 @@ void keyPressed() {
     currentColor = 1;
   else if(key == 'b')
     currentColor = 2;
+  else if(key == 'w')
+    currentColor = 3;
   else if(key == 'c')
     multiColor = !multiColor;
   else if(key == 'd'){    
