@@ -22,13 +22,13 @@ class CustomLowPass implements AudioEffect {
   }
   
   void process(float[] signal) {
-    for(int i = 1; i < 1024; i++)
+    for(int i = 1; i < signal.length; i++)
       signal[i] = signal[i-1] + freq * (signal[i] - signal[i-1]);
   }
   
   void process(float[] sigLeft, float[] sigRight) {
-    process(sigLeft);
-    process(sigRight);
+    this.process(sigLeft);
+    this.process(sigRight);
   }
 }
 
@@ -129,7 +129,7 @@ void displayMetaInfo() {
 void keyPressed() {
   if(key == 'm') {
     if (muted) {
-      fadeIn(song, 5);
+      fadeIn(song, 3.5);
       muted = false;
     }
     else {
@@ -176,10 +176,9 @@ void keyPressed() {
 }
 
 
-void fadeIn(AudioPlayer song, int duration){
+void fadeIn(AudioPlayer song, float duration){
   float gain = song.getGain();
-  song.shiftGain(gain, initialGain, duration*1000);
-  
+  song.shiftGain(gain, initialGain, parseInt(duration*1000));  
 }
 
 /*
@@ -189,9 +188,9 @@ Param:
   - durantion: duration in seconds of the fadeOut.
 */
 
-void fadeOut(AudioPlayer song, int duration){
+void fadeOut(AudioPlayer song, float duration){
     float gain = song.getGain();
-    song.shiftGain(gain, -100, duration*1000);
+    song.shiftGain(gain, -100, parseInt(duration*1000));
 }
 
 
