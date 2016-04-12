@@ -4,15 +4,18 @@ Boolean grayscale;
 void setup() {
   img = loadImage("PCMLab8.png");
   grayscale = false;
-  size(img.width, img.height);
+  size(img.width*2, img.height);
 }
 
 void draw() {
+  clear();
+  background(0xFFCDCDCD);
    image(img, 0,0);
    if(grayscale){
      rgb2gray(img);
    }
    drawHistogram(img);
+   
 }
 
 void stop() {
@@ -31,9 +34,9 @@ void keyPressed() {
 void rgb2gray(PImage img){
   loadPixels();
   img.loadPixels();
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      int loc = x + y*width;
+  for (int y = 0; y < img.height; y++) {
+    for (int x = 0; x < img.width; x++) {
+      int loc = x + y*img.width;
       
       // The functions red(), green(), and blue() pull out the 3 color components from a pixel.
       float r = red(img.pixels[loc]);
@@ -46,7 +49,7 @@ void rgb2gray(PImage img){
       
       // Set the display pixel to the image pixel
       float luminance = 0.3 * r + 0.59 * g  + 0.11*b;
-      pixels[loc] =  color(luminance, luminance, luminance);          
+      pixels[loc-y*img.width+y*width] =  color(luminance, luminance, luminance);          
     }
   }
   updatePixels();
@@ -66,7 +69,7 @@ void drawHistogram(PImage img){
   // Find the largest value in the histogram
   int histMax = max(histogram);
   
-  stroke(255);
+  stroke(0xFF000000);
   // Draw half of the histogram (skip every second value)
   for (int i = 0; i < img.width; i += 2) {
     // Map i (from 0..img.width) to a location in the histogram (0..255)
@@ -74,7 +77,7 @@ void drawHistogram(PImage img){
     // Convert the histogram value to a location between 
     // the bottom and the top of the picture
     int y = int(map(histogram[which], 0, histMax, img.height, 0));
-    line(i, img.height, i, y);
+    line(i+img.width, img.height, i+img.width, y);
   }
   
 }
