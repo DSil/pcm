@@ -15,15 +15,9 @@ void draw() {
    image(img, 0,0);
    if(grayscale) rgb2gray(img);
    if(threshold) thresholding(img, 250);
+   if(negative) negation(img);
    drawHistogram(img);   
 }
-
-void stop() {
-
-}
-
-
-  
 
 void keyPressed() {
   if(key=='g')
@@ -68,11 +62,7 @@ void thresholding(PImage img, int l) {
       g = green(img.pixels[loc]);
       b = blue(img.pixels[loc]);
       
-      // Image Processing would go here
-      // If we were to change the RGB values, we would do it here, 
-      // before setting the pixel in the display window.
-      
-      // Set the display pixel to the image pixel
+      // Apply threshold
       luminance = 0.3 * r + 0.59 * g  + 0.11*b;
       if (luminance > l)
         pixels[loc-y*img.width+y*width] = color(255);
