@@ -1,5 +1,8 @@
 PImage img;
-Boolean grayscale, threshold, negative, colorized, sepia;
+Boolean grayscale, threshold, negative, colorized, sepia, contrast;
+
+// Define the contrast lvl here
+//int contrastParam;
 
 void setup() {
   img = loadImage("PCMLab8.png");
@@ -8,6 +11,7 @@ void setup() {
   negative = false;
   colorized = false;
   sepia = false;
+  contrast = false;
   size(img.width*2, img.height);
 }
 
@@ -20,6 +24,7 @@ void draw() {
    if(negative) negation(img);
    if(colorized) superColor(img);
    if(sepia) sepiate(img);
+   if(contrast) increaseContrast(img, 150);
    drawHistogram(img);   
 }
 
@@ -34,6 +39,8 @@ void keyPressed() {
     colorized = !colorized;
   else if(key == 's')
     sepia = !sepia;
+  else if(key == 'r')
+    contrast = !contrast;
 }
 
 void negation(PImage img) {
@@ -158,7 +165,31 @@ void sepiate(PImage img){
   updatePixels();
 }
 
+void increaseContrast(PImage img, int param){
+  loadPixels();
+  img.loadPixels();
+  float r,g,b, newRed, newGreen, newBlue;
+  int loc;
+  float factor = (259 * (param +255)) / (255 * (259 - param));
+  for (int y = 0; y < img.height; y++) {
+    for (int x = 0; x < img.width; x++) {
+      loc = x + y*img.width;
+      
+      // The functions red(), green(), and blue() pull out the 3 color components from a pixel.
+      r = red(img.pixels[loc]);
+      g = green(img.pixels[loc]);
+      b = blue(img.pixels[loc]);
+  
+ 
+      newRed = round(factor * (r -128)+128);
+      newGreen = round(factor * (g -128)+128);
+      newBlue = round(factor * (b -128)+128);
 
+      pixels[loc-y*img.width+y*width] =  color(newRed, newGreen, newBlue);          
+    }
+  }
+  updatePixels();
+}
 
 void drawHistogram(PImage img){
   int[] histogram = new int[256];
