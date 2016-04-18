@@ -24,7 +24,7 @@ void draw() {
    if(negative) negation(img);
    if(colorized) superColor(img);
    if(sepia) sepiate(img);
-   if(contrast) increaseContrast(img, 150);
+   if(contrast) increaseContrast(img, contrast_value);
    drawHistogram(img);   
 }
 
@@ -43,7 +43,7 @@ void keyPressed() {
     contrast = !contrast;
   else if(key == CODED) {
     if(keyCode == UP) {
-      //Increase contrast
+      contrast_value = (contrast_value == 255) ? contrast_value + 1 : contrast_value;
     }
     else if(keyCode == DOWN) {
       //Decrease contrast
