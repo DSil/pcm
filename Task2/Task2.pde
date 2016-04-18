@@ -1,5 +1,6 @@
 PImage img;
 Boolean grayscale, threshold, negative, colorized, sepia, contrast;
+int contrast_value;
 
 // Define the contrast lvl here
 //int contrastParam;
@@ -12,6 +13,7 @@ void setup() {
   colorized = false;
   sepia = false;
   contrast = false;
+  contrast_value = 150;
   size(img.width*2, img.height);
 }
 
@@ -43,10 +45,10 @@ void keyPressed() {
     contrast = !contrast;
   else if(key == CODED) {
     if(keyCode == UP) {
-      contrast_value = (contrast_value == 255) ? contrast_value + 1 : contrast_value;
+      contrast_value = (contrast_value != 255) ? contrast_value + 5 : contrast_value;
     }
     else if(keyCode == DOWN) {
-      //Decrease contrast
+      contrast_value = (contrast_value != -255) ? contrast_value - 5 : contrast_value;
     }
   }
 }
