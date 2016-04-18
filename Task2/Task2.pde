@@ -193,11 +193,17 @@ void increaseContrast(PImage img, int param){
 
 void drawHistogram(PImage img){
   int[] histogram = new int[256];
+  int loc;
+  float luminance,r,g,b;
    // Calculate the histogram
-  for (int i = 0; i < img.width; i++) {
-    for (int j = 0; j < img.height; j++) {
-      int bright = int(brightness(get(i, j)));
-      histogram[bright]++; 
+  for (int y = 0; y < img.width; y++) {
+    for (int x = 0; x < img.height; x++) {
+      loc = x + y*img.width;
+      r = red(img.pixels[loc]);
+      g = green(img.pixels[loc]);
+      b = blue(img.pixels[loc]);
+      luminance = 0.3 * r + 0.59 * g  + 0.11*b;
+      histogram[(int)luminance]++; 
     }
   }
   
