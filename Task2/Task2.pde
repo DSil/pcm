@@ -41,6 +41,14 @@ void keyPressed() {
     sepia = !sepia;
   else if(key == 'r')
     contrast = !contrast;
+  else if(key == CODED) {
+    if(keyCode == UP) {
+      //Increase contrast
+    }
+    else if(keyCode == DOWN) {
+      //Decrease contrast
+    }
+  }
 }
 
 void negation(PImage img) {
