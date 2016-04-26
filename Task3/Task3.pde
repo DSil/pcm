@@ -4,6 +4,8 @@ PImage frame, prev_frame;
 int filter; //0 = high_pass
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
+float[][] lp_matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+float[][] ed_matrix = {{0, -1, 0}, {-1, 4, -1}, {0, -1, 0}};
 
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
@@ -42,6 +44,8 @@ color apply_filter(int x, int y, PImage img) {
   float[][] matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
   switch (filter) {
     case 0: matrix = hp_matrix; break;
+    case 1: matrix = lp_matrix; break;
+    case 3: matrix = ed_matrix; break;
     default: break;
   }
   int matrixSize = matrix.length;
