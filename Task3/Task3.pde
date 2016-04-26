@@ -1,17 +1,17 @@
 import processing.video.*;
 Movie movie;
 PImage frame, prev_frame;
-int filter; //0 = high_pass
+int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
-float[][] lp_matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+float[][] lp_matrix = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
 float[][] ed_matrix = {{0, -1, 0}, {-1, 4, -1}, {0, -1, 0}};
 
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
   movie.play();
   size(320,240);
-  filter = 0;
+  filter = -1;
 }
 
 void draw() {
@@ -45,7 +45,7 @@ color apply_filter(int x, int y, PImage img) {
   switch (filter) {
     case 0: matrix = hp_matrix; break;
     case 1: matrix = lp_matrix; break;
-    case 3: matrix = ed_matrix; break;
+    case 2: matrix = ed_matrix; break;
     default: break;
   }
   int matrixSize = matrix.length;
