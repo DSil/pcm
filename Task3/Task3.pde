@@ -1,17 +1,22 @@
 import processing.video.*;
 Movie movie;
 PImage frame, prev_frame;
-int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection
+Boolean difference1, difference2, filterOn;
+int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection, 3 = emboss blur
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
-float[][] lp_matrix = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
+float[][] lp_matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 float[][] ed_matrix = {{-1, -1, -1}, {-1, 8, -1}, {-1, -1, -1}};
+float[][] emboss_matrix = {{2, 0, 0}, {0, -1, 0}, {0, 0, -1}};
 
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
   movie.play();
   size(320,240);
-  filter = 2;
+  filter = -1;
+  difference1 = false;
+  difference2 = false;
+  filterOn = false;
 }
 
 void draw() {
@@ -22,11 +27,26 @@ void draw() {
   frame = get(0, 0, width, height);
   image(frame, 0, 0);
   loadPixels();
-  for (int y = 0; y < height; y++) {
-    for (int x = 0; x < width; x++) {
-      c = apply_filter(x,y,frame);
-      loc = x + y*frame.width;
-      pixels[loc] = c;
+  if(!difference1 && !difference2) {
+    if(filterOn) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+          c = apply_filter(x,y,frame);
+          loc = x + y*frame.width;
+          pixels[loc] = c;
+        }
+      }
+    }
+  }
+  else if(difference1 || difference2) {
+    for (int y = 0; y < height; y++) {
+      for (int x = 0; x < width; x++) {
+        loc = x + y*frame.width;
+        if(difference1)
+          pixels[loc] = calculateDiff1(loc, prev_frame, frame);
+        else
+          pixels[loc] = calculateDiff2(loc, prev_frame, frame);
+      }
     }
   }
   updatePixels();
@@ -36,16 +56,47 @@ void movieEvent(Movie m) {
   m.read();
 }
 
+void keyPressed() {
+  if(key == 'd') {
+    difference1 = !difference1;
+  }
+  if(key == 'e') {
+    difference2 = !difference2;
+  }
+  else if(key == '0' || key == '1' || key == '2' || key == '3')
+    filter = Character.getNumericValue(key);
+  else if(key == 'f')
+    filterOn = !filterOn;
+}
+
+color calculateDiff1(int loc, PImage prev, PImage actual) {
+  int dif = actual.pixels[loc] - prev.pixels[loc];
+  if(dif > 0)
+    return color(255);
+  else if(dif < 0)
+    return color(0);
+  else return actual.pixels[loc];
+}
+
+color calculateDiff2(int loc, PImage prev, PImage actual) {
+  int dif = actual.pixels[loc] - prev.pixels[loc];
+  if(dif != 0)
+    return color(255);
+  else
+    return color(0);
+}
+
 color apply_filter(int x, int y, PImage img) {
   int xloc, yloc, loc;
   float rtotal = 0.0;
   float gtotal = 0.0;
   float btotal = 0.0;
-  float[][] matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
+  float[][] matrix = {{0, 0, 0}, {0, 1, 0}, {0, 0, 0}};
   switch (filter) {
     case 0: matrix = hp_matrix; break;
     case 1: matrix = lp_matrix; break;
     case 2: matrix = ed_matrix; break;
+    case 3: matrix = emboss_matrix; break;
     default: break;
   }
   int matrixSize = matrix.length;
