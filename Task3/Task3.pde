@@ -5,13 +5,13 @@ int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
 float[][] lp_matrix = {{1, 2, 1}, {2, 4, 2}, {1, 2, 1}};
-float[][] ed_matrix = {{0, -1, 0}, {-1, 4, -1}, {0, -1, 0}};
+float[][] ed_matrix = {{-1, -1, -1}, {-1, 8, -1}, {-1, -1, -1}};
 
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
   movie.play();
   size(320,240);
-  filter = -1;
+  filter = 2;
 }
 
 void draw() {
