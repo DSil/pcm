@@ -88,6 +88,7 @@ color calculateDiff2(int loc, PImage prev, PImage actual) {
 
 color apply_filter(int x, int y, PImage img) {
   int xloc, yloc, loc;
+  float p = 0.0;
   float rtotal = 0.0;
   float gtotal = 0.0;
   float btotal = 0.0;
@@ -101,15 +102,19 @@ color apply_filter(int x, int y, PImage img) {
   }
   int matrixSize = matrix.length;
   int offset = matrixSize / 2;
+  for(int i = 0; i < matrixSize; i++)
+    for(int j = 0; j < matrixSize; j++)
+      p += matrix[i][j];
+  if (p == 0) p = 1;
   for (int i = 0; i < matrixSize; i++) {
     for (int j = 0; j < matrixSize; j++) {
       xloc = x+i-offset;
       yloc = y+j-offset;
       loc = xloc + img.width*yloc;
       loc = constrain(loc,0,img.pixels.length-1);
-      rtotal += (red(img.pixels[loc]) * matrix[i][j]);
-      gtotal += (green(img.pixels[loc]) * matrix[i][j]);
-      btotal += (blue(img.pixels[loc]) * matrix[i][j]);
+      rtotal += ((red(img.pixels[loc]) * matrix[i][j])/p);
+      gtotal += ((green(img.pixels[loc]) * matrix[i][j])/p);
+      btotal += ((blue(img.pixels[loc]) * matrix[i][j])/p);
     }
   }
   rtotal = constrain(rtotal, 0, 255);
