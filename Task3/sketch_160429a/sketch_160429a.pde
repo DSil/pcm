@@ -8,6 +8,8 @@ float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
 float[][] lp_matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
 float[][] ed_matrix = {{-1, -1, -1}, {-1, 8, -1}, {-1, -1, -1}};
 float[][] emboss_matrix = {{2, 0, 0}, {0, -1, 0}, {0, 0, -1}};
+float[][] motion_matrix = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+
 
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
@@ -63,7 +65,7 @@ void keyPressed() {
   if(key == 'e') {
     difference2 = !difference2;
   }
-  else if(key == '0' || key == '1' || key == '2' || key == '3')
+  else if(key == '0' || key == '1' || key == '2' || key == '3' || key=='4')
     filter = Character.getNumericValue(key);
   else if(key == 'f')
     filterOn = !filterOn;
@@ -98,6 +100,8 @@ color apply_filter(int x, int y, PImage img) {
     case 1: matrix = lp_matrix; break;
     case 2: matrix = ed_matrix; break;
     case 3: matrix = emboss_matrix; break;
+    case 4: matrix = motion_matrix; break;
+    //case 5: matrix = _matrix; break;
     default: break;
   }
   int matrixSize = matrix.length;
