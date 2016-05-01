@@ -1,7 +1,7 @@
 import processing.video.*;
 Movie movie;
 PImage frame, prev_frame;
-Boolean difference1, difference2, filterOn;
+Boolean difference1, difference2, filterOn, flipOn;
 int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection, 3 = emboss blur
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
@@ -19,6 +19,7 @@ void setup() {
   difference1 = false;
   difference2 = false;
   filterOn = false;
+  flipOn = false;
 }
 
 void draw() {
@@ -51,6 +52,9 @@ void draw() {
       }
     }
   }
+  else if(flipOn){
+    mirror(frame); 
+  }
   updatePixels();
 }
 
@@ -69,6 +73,19 @@ void keyPressed() {
     filter = Character.getNumericValue(key);
   else if(key == 'f')
     filterOn = !filterOn;
+  else if(key=='m')
+    flipOn = !flipOn;
+}
+
+void mirror(PImage img){
+   // Begin loop for width
+   for (int i = 0; i < width; i++) {
+     // Begin loop for height
+     for (int j = 0; j < height; j++) {    
+      // TODO:: pois .. nao consigo aceder aos pixeis da frame.. 
+       pixels[j*width+i] = img[(width - i - 1) + j*width]; // Reversing x to mirror the image
+     }
+   }
 }
 
 color calculateDiff1(int loc, PImage prev, PImage actual) {
