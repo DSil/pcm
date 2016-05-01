@@ -1,7 +1,7 @@
 import processing.video.*;
 Movie movie;
 PImage frame, prev_frame;
-Boolean difference1, difference2, filterOn, flipOn;
+Boolean difference1, difference2, filterOn, horizontalFlipOn, verticalFlipOn;
 int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection, 3 = emboss blur
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
@@ -19,7 +19,8 @@ void setup() {
   difference1 = false;
   difference2 = false;
   filterOn = false;
-  flipOn = false;
+  horizontalFlipOn = false;
+  verticalFlipOn = false;
 }
 
 void draw() {
@@ -52,9 +53,10 @@ void draw() {
       }
     }
   }
-  else if(flipOn){
-    mirror(frame); 
-  }
+  if(horizontalFlipOn)
+    horizontalMirror(frame); 
+  if(verticalFlipOn)
+    verticalMirror(frame);
   updatePixels();
 }
 
@@ -63,29 +65,30 @@ void movieEvent(Movie m) {
 }
 
 void keyPressed() {
-  if(key == 'd') {
+  if(key == 'd')
     difference1 = !difference1;
-  }
-  if(key == 'e') {
+  else if(key == 'e')
     difference2 = !difference2;
-  }
   else if(key == '0' || key == '1' || key == '2' || key == '3' || key=='4')
     filter = Character.getNumericValue(key);
   else if(key == 'f')
     filterOn = !filterOn;
-  else if(key=='m')
-    flipOn = !flipOn;
+  else if(key == 'm')
+    horizontalFlipOn = !horizontalFlipOn;
+  else if(key == 'v')
+    verticalFlipOn = !verticalFlipOn;
 }
 
-void mirror(PImage img){
-   // Begin loop for width
+void horizontalMirror(PImage img){
    for (int i = 0; i < width; i++) {
-     // Begin loop for height
      for (int j = 0; j < height; j++) {    
-      // TODO:: pois .. nao consigo aceder aos pixeis da frame.. 
-       pixels[j*width+i] = img[(width - i - 1) + j*width]; // Reversing x to mirror the image
+       pixels[j*width+i] = img.pixels[(width - i - 1) + j*width]; // Reversing x to mirror the image
      }
    }
+}
+
+void verticalMirror(PImage img) {
+  //TODO
 }
 
 color calculateDiff1(int loc, PImage prev, PImage actual) {
