@@ -2,7 +2,7 @@ import processing.video.*;
 Movie movie;
 PImage frame, prev_frame;
 Boolean difference1, difference2, filterOn, horizontalFlipOn, verticalFlipOn;
-int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection, 3 = emboss blur
+int filter; //0 = high_passl, 1 = low_pass, 2 = edge_detection, 3 = emboss blur 4 = motion
 
 float[][] hp_matrix = {{-1, -1, -1}, {-1, 9, -1}, {-1, -1, -1}};
 float[][] lp_matrix = {{1, 1, 1}, {1, 1, 1}, {1, 1, 1}};
@@ -14,6 +14,7 @@ float[][] motion_matrix = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
 void setup() {
   movie = new Movie(this, "PCMLab9.mov");
   movie.play();
+  movie.loop();
   size(320,240);
   filter = -1;
   difference1 = false;
@@ -55,10 +56,11 @@ void draw() {
   }
   if(horizontalFlipOn) {
     horizontalMirror(frame);
+    updatePixels();
     frame = get(0,0,width,height);
   } 
   if(verticalFlipOn)
-    verticalMirror(frame);
+    verticalMirror(frame);    
   updatePixels();
 }
 
@@ -127,7 +129,6 @@ color apply_filter(int x, int y, PImage img) {
     case 2: matrix = ed_matrix; break;
     case 3: matrix = emboss_matrix; break;
     case 4: matrix = motion_matrix; break;
-    //case 5: matrix = _matrix; break;
     default: break;
   }
   int matrixSize = matrix.length;
