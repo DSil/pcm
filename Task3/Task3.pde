@@ -53,8 +53,10 @@ void draw() {
       }
     }
   }
-  if(horizontalFlipOn)
-    horizontalMirror(frame); 
+  if(horizontalFlipOn) {
+    horizontalMirror(frame);
+    frame = get(0,0,width,height);
+  } 
   if(verticalFlipOn)
     verticalMirror(frame);
   updatePixels();
@@ -88,7 +90,11 @@ void horizontalMirror(PImage img){
 }
 
 void verticalMirror(PImage img) {
-  //TODO
+  for (int i = 0; i < width; i++) {
+     for (int j = 0; j < height; j++) {    
+       pixels[j*width+i] = img.pixels[(height - j - 1)*width+i]; // Reversing y to mirror the image
+     }
+   }
 }
 
 color calculateDiff1(int loc, PImage prev, PImage actual) {
