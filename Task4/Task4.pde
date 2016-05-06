@@ -68,7 +68,7 @@ int[] calculateHistogram(PImage img) {
   return histogram;
 }
 
-int  histogramDifferences(int[] prev_histogram, int [] actual_histogram){
+int histogramDifferences(int[] prev_histogram, int [] actual_histogram){
   int difference = 0;
   for (int i = 0; i < prev_histogram.length; i++) {
     difference = difference + abs(prev_histogram[i]-actual_histogram[i]);
