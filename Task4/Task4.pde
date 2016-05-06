@@ -33,7 +33,7 @@ void draw() {
   
   histogram = calculateHistogram(frame);
   boolean transition = detectTransitions(prev_histogram, histogram, threshold);
-  if(transition){
+  if(transition) {
     saveFrame("Frame-Transition-##.png");
     t1.println(movie.time());
   }
@@ -54,6 +54,8 @@ void timer() {
   }
   output.flush();
   output.close();
+  t1.flush();
+  t1.close();
 }
 
 int[] calculateHistogram(PImage img) {
@@ -71,18 +73,15 @@ int[] calculateHistogram(PImage img) {
 int histogramDifferences(int[] prev_histogram, int [] actual_histogram){
   int difference = 0;
   for (int i = 0; i < prev_histogram.length; i++) {
-    difference = difference + abs(prev_histogram[i]-actual_histogram[i]);
+    difference += abs(prev_histogram[i]-actual_histogram[i]);
   }
   return difference;
 }
 
 boolean detectTransitions(int [] prev_histogram, int [] actual_histogram, int threshold){
   int difference = histogramDifferences(prev_histogram, histogram);
-  print(difference+"|");
-  if(difference > threshold){
-     return true;
-  }
-  return false;
+  //print(difference+"|");
+  return difference > threshold;
 }
 
 
