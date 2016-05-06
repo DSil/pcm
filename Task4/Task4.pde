@@ -7,7 +7,7 @@ float duration;
 PImage frame;
 int[] histogram = new int[256];
 int[] prev_histogram = new int[256];
-int threshold = 300000;
+int threshold = 250000;
 
 void setup() {
   movie = new Movie(this, "PCMLab10.mov");
@@ -32,7 +32,7 @@ void draw() {
   frame = get(0,0,width,height);
   
   histogram = calculateHistogram(frame);
-  boolean transition = detectTransitions(prev_histogram, histogram, threshold);
+  boolean transition = detectTransitions(prev_histogram, histogram);
   if(transition) {
     saveFrame("Frame-Transition-##.png");
     t1.println(movie.time());
@@ -78,7 +78,7 @@ int histogramDifferences(int[] prev_histogram, int [] actual_histogram){
   return difference;
 }
 
-boolean detectTransitions(int [] prev_histogram, int [] actual_histogram, int threshold){
+boolean detectTransitions(int [] prev_histogram, int [] actual_histogram){
   int difference = histogramDifferences(prev_histogram, histogram);
   //print(difference+"|");
   return difference > threshold;
