@@ -32,8 +32,7 @@ void draw() {
   frame = get(0,0,width,height);
   
   histogram = calculateHistogram(frame);
-  boolean transition = detectTransitions(prev_histogram, histogram);
-  if(transition) {
+  if(detectTransitions(prev_histogram, histogram)) {
     saveFrame("Frame-Transition-##.png");
     t1.println(movie.time());
   }
