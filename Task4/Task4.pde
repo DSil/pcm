@@ -1,6 +1,6 @@
 import processing.video.*;
 Movie movie;
-PrintWriter output, t1;
+PrintWriter output, t1, tc;
 boolean frameTrigger;
 final int TIMER = 5050;
 float duration;
@@ -8,6 +8,8 @@ PImage frame;
 int[] histogram = new int[256];
 int[] prev_histogram = new int[256];
 int threshold = 250000;
+int thresholdTC = 500000;
+int cumulative = 0;
 
 void setup() {
   movie = new Movie(this, "PCMLab10.mov");
@@ -18,6 +20,7 @@ void setup() {
   thread("timer");
   output = createWriter("stroboscopic_segmentation.txt");
   t1 = createWriter("detected_transitions.txt");
+  tc = createWriter("twin_comparison.txt");
   for (int i = 0; i < 256; i++) {
     prev_histogram[i] = 0;
   }
@@ -35,6 +38,11 @@ void draw() {
   if(detectTransitions(prev_histogram, histogram)) {
     saveFrame("Frame-Transition-##.png");
     t1.println(movie.time());
+    if (cumulative >= thresholdTC) {
+      saveFrame("Frame-Twin-Comparison-##.png");
+      tc.println(movie.time());
+    }
+    cumulative = 0;
   }
   
   if(frameTrigger) {
@@ -43,7 +51,15 @@ void draw() {
     output.println(movie.time());
   }
   prev_histogram = histogram;
-  
+  output.flush();
+  t1.flush();
+  tc.flush();
+  if(movie.time() >= duration) {
+    output.close();
+    t1.close();
+    tc.close();
+    exit();
+  }
 }
 
 void timer() {
@@ -51,10 +67,6 @@ void timer() {
     frameTrigger = true;
     delay(TIMER);
   }
-  output.flush();
-  output.close();
-  t1.flush();
-  t1.close();
 }
 
 int[] calculateHistogram(PImage img) {
@@ -74,6 +86,7 @@ int histogramDifferences(int[] prev_histogram, int [] actual_histogram){
   for (int i = 0; i < prev_histogram.length; i++) {
     difference += abs(prev_histogram[i]-actual_histogram[i]);
   }
+  cumulative += difference;
   return difference;
 }
 
