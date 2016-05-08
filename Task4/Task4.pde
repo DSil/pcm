@@ -1,6 +1,6 @@
 import processing.video.*;
 Movie movie;
-PrintWriter output, t1, tc;
+PrintWriter output, t1, tc, txt;
 boolean frameTrigger;
 final int TIMER = 5050;
 float duration;
@@ -8,9 +8,11 @@ PImage frame;
 int[] histogram = new int[256];
 int[] prev_histogram = new int[256];
 int threshold = 250000;
-int thresholdTC = 500000;
+int thresholdTC = 50000;
+int diff;
+int nframe;
 int cumulative = 0;
-int option = 4; //0 = ver video; 1 = stroboscopic segmentation; 2 = parameterisable threshold; 3 = twin-comparison; 4 = parameterisable threshold with otsu
+int option = 3; //0 = ver video; 1 = stroboscopic segmentation; 2 = parameterisable threshold; 3 = twin-comparison; 4 = parameterisable threshold with otsu
 
 void setup() {
   movie = new Movie(this, "PCMLab10.mov");
@@ -19,12 +21,16 @@ void setup() {
   size(960,540);
   frameTrigger = false;
   thread("timer");
-  output = createWriter("stroboscopic_segmentation.txt");
-  t1 = createWriter("detected_transitions.txt");
-  tc = createWriter("twin_comparison.txt");
+  if (option == 1) output = createWriter("stroboscopic_segmentation.txt");
+  else {
+    t1 = createWriter("detected_transitions.txt");
+    tc = createWriter("twin_comparison.txt");
+    txt = createWriter("transition_report.txt");
+  }
   for (int i = 0; i < 256; i++) {
     prev_histogram[i] = 0;
   }
+  nframe = 0;
 }
 
 void movieEvent(Movie m) {
@@ -34,56 +40,57 @@ void movieEvent(Movie m) {
 void draw() {
   image(movie, 0, 0);
   frame = get(0,0,width,height);
+  nframe++;
 
   if(option !=0){
   
     histogram = calculateHistogram(frame);
-    if(option == 4){
-      threshold = int( otsu(histogram, width*height));
-    }
-    if(option !=1){
-      if(detectTransitions(prev_histogram, histogram)) {
-        saveFrame("Frame-Transition-##.png");
+    
+    if(option == 4)
+      threshold = int(otsu(histogram, width*height));
+    
+    diff = histogramDifferences(prev_histogram, histogram);
+    if(option != 1) {
+      if(diff >= threshold) {
+        saveFrame("Frame-Transition-" + nframe + ".png");
         t1.println(movie.time());
-        if(option==3){
-          if (cumulative >= thresholdTC) {
-            saveFrame("Frame-Twin-Comparison-##.png");
+        txt.println(nframe + "\t" + diff + "\t" + threshold + "\t" + threshold);
+      }
+      else if(option != 4 && diff >= thresholdTC) {
+          if (cumulative >= threshold) {
+            saveFrame("Frame-Twin-Comparison-" + nframe + ".png");
             tc.println(movie.time());
+            txt.println(nframe + "\t" + diff + "\t" + threshold + "\t" + thresholdTC);
           }
           cumulative = 0;
-        }
       }
     }
-    
-    if(option == 1){
+    else {
       if(frameTrigger) {
         frameTrigger = false;
-        saveFrame("Frame-##.png");
+        saveFrame("Frame-" + nframe + ".png");
         output.println(movie.time());
       }
-    }
+    }  
+  }    
+  prev_histogram = histogram;
+  switch(option) {
+     case 1: output.flush(); break;
+     case 4:
+     case 2: t1.flush();
+     case 3: tc.flush();
+     default : txt.flush();
+  }
     
-    prev_histogram = histogram;
+  if(movie.time() >= duration) {
     switch(option){
-       case 0: break;
-       case 1:  output.flush();
-       case 2: t1.flush();
-       case 3: tc.flush();
-       case 4: break;
+       case 1: output.close(); break;
+       case 4:
+       case 2: t1.close();
+       case 3: tc.close();
+       default: txt.close();
     }
-    
-    
-    
-    if(movie.time() >= duration) {
-      switch(option){
-         case 0: break;
-         case 1:  output.flush();
-         case 2: t1.flush();
-         case 3: tc.flush();
-         case 4: break;
-      }
-      exit();
-    }
+    exit();
   }
 }
 
@@ -114,13 +121,6 @@ int histogramDifferences(int[] prev_histogram, int [] actual_histogram){
   cumulative += difference;
   return difference;
 }
-
-boolean detectTransitions(int [] prev_histogram, int [] actual_histogram){
-  int difference = histogramDifferences(prev_histogram, histogram);
-  return difference > threshold;
-}
-
-
 
 float otsu(int [] histogram,int total) {
     int sum = 0;
