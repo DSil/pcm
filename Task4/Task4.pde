@@ -3,16 +3,17 @@ Movie movie;
 PrintWriter output, t1, tc, txt;
 boolean frameTrigger;
 final int TIMER = 5050;
-float duration;
+float duration, averageDiff = 0.0;
 PImage frame;
 int[] histogram = new int[256];
 int[] prev_histogram = new int[256];
 int threshold = 250000;
 int thresholdTC = 50000;
+float thresholdMean = 0.0;
 int diff;
 int nframe;
 int cumulative = 0;
-int option = 3; //0 = ver video; 1 = stroboscopic segmentation; 2 = parameterisable threshold; 3 = twin-comparison; 4 = parameterisable threshold with otsu
+int option = 5; //0 = ver video; 1 = stroboscopic segmentation; 2 = parameterisable threshold; 3 = twin-comparison; 4 = parameterisable threshold with otsu
 
 void setup() {
   movie = new Movie(this, "PCMLab10.mov");
@@ -50,6 +51,18 @@ void draw() {
       threshold = int(otsu(histogram, width*height));
     
     diff = histogramDifferences(prev_histogram, histogram);
+
+    
+    if(option == 5) {
+      averageDiff = ((averageDiff * (nframe - 1)) + diff) / nframe;
+      thresholdMean = averageDiff * 10.0;
+
+      if (nframe == 1 || diff >= thresholdMean) {
+        saveFrame("Mean-Transition-" + nframe + ".png");
+        txt.println(nframe + "\t" + diff + "\t" + thresholdMean + "\t" + thresholdMean);
+      }
+    }
+    
     if(option != 1) {
       if(diff >= threshold) {
         saveFrame("Frame-Transition-" + nframe + ".png");
@@ -57,25 +70,26 @@ void draw() {
         txt.println(nframe + "\t" + diff + "\t" + threshold + "\t" + threshold);
       }
       else if(option != 4 && diff >= thresholdTC) {
-          if (cumulative >= threshold) {
+          if (cumulative >= threshold || cumulative == 0) {
             saveFrame("Frame-Twin-Comparison-" + nframe + ".png");
             tc.println(movie.time());
             txt.println(nframe + "\t" + diff + "\t" + threshold + "\t" + thresholdTC);
           }
           cumulative = 0;
       }
-    }
+     }
     else {
       if(frameTrigger) {
         frameTrigger = false;
         saveFrame("Frame-" + nframe + ".png");
         output.println(movie.time());
       }
-    }  
+    }   
   }    
   prev_histogram = histogram;
   switch(option) {
      case 1: output.flush(); break;
+     case 5:
      case 4:
      case 2: t1.flush();
      case 3: tc.flush();
@@ -85,6 +99,7 @@ void draw() {
   if(movie.time() >= duration) {
     switch(option){
        case 1: output.close(); break;
+       case 5:
        case 4:
        case 2: t1.close();
        case 3: tc.close();
