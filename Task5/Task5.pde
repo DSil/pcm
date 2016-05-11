@@ -1,32 +1,46 @@
 import processing.video.*;
-Movie movie1, movie2, movie_aux; 
+Movie movie1, movie2;
+Movie[] movies = {movie1, movie2};
 PImage frame;
-int nframe, numPixels, movie=2;
-Boolean wipe, fade, fadingOut, fadingIn;
-int filter, alpha;
+int nframe, numPixels, curr_movie=0, other_movie=1;
+Boolean wipe, fade, fadingOut, fadingIn, cube;
+int filter, alpha, wipePixels;
 
 
 void setup() {
   movie1 = new Movie(this, "PCMLab11-1.mov");
   movie2 = new Movie(this, "PCMLab11-2.mov");
-  movie_aux = movie2;
-  movie_aux.play();
-  nframe =0;
-  numPixels = 320; wipe = false; fade = false; fadingOut =false; fadingIn = false;
+  movies[0] = movie1;
+  movies[1] = movie2;
+  movies[curr_movie].play();
+  movies[curr_movie].loop();
+  movies[other_movie].play();
+  movies[other_movie].loop();
+  
+  wipePixels = 0;
+  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false;
   size(320,240);
   alpha = 0;
 }
 
 
 void draw() {
-  image(movie_aux, 0, 0, 320, 240);
+  image(movies[curr_movie], 0, 0, 320, 240);
+
   frame = get(0,0,width,height);
-  nframe++; 
   
-  if(fade){ 
+  
+  if(fade){
      fadeOut(frame, alpha);
   }
-  updatePixels();
+  if(cube){
+     startCube();
+  }
+  if(wipe){
+   startWipe(); 
+  }
+
+   updatePixels();
 }
 
 
@@ -38,6 +52,7 @@ void keyPressed() {
     changeMovie();
   }
   if (key == 'f') { fade = !fade; fadingOut = !fadingOut;}
+  if (key == 'c') { cube = !cube; }
 }
 
 void movieEvent(Movie m) {
@@ -80,27 +95,36 @@ void fadeOut(PImage img, int a) {
    
 }
 
-void startWipe(PImage frame1, PImage frame2){
-  /*  while(numPixels>0){
-      for (int i = 0; i < width; i++) {
-         for (int j = 0; j < height; j++) {    
-           pixels[j*width+i] = img.pixels[(height - j - 1)*width+i]; // Reversing y to mirror the image
-         }
-       }
-      numPixels--;  
-    }
-    numPixels = 320;*/
+void startCube(){
+  if(wipePixels <= width){
+    image(movies[other_movie], 0, 0, wipePixels, height);
+    image(movies[curr_movie], wipePixels, 0, width-wipePixels, height);
+    wipePixels++;
+  else{
+    wipePixels = 0;
+    changeMovie();
+    cube = !cube;
+
+  }
+  
+}
+
+void startWipe(){
+  if(wipePixels <= width){
+    image(movies[other_movie], wipePixels-width, 0, width, height);
+    image(movies[curr_movie], wipePixels, 0, width, height);
+    wipePixels++;
+  }else{
+    wipePixels = 0;
+    changeMovie();
+    wipe = !wipe;
+
+  }
+  
 }
 
 void changeMovie(){
- movie_aux.pause();
- if(movie==1){
-   movie=2;
-   movie_aux = movie2;
- }else{
-  movie = 1;
-  movie_aux = movie1; 
- }
- movie_aux.play();
- movie_aux.loop();
+ int aux_movie = curr_movie;
+ curr_movie = other_movie;
+ other_movie = aux_movie;
 }
