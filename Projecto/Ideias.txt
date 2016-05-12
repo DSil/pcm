@@ -1,0 +1,10 @@
+Tema principal: Interface do futuro -> Interface sem mãos
+
+Video:
+	- Falar do que existe hoje e criar um filme connosco a interagir com as interfaces de hoje e depois fazer um fast foward para o futuro e mostrar interface sem as mãos;
+	- Mandar a piada a dizer que a interface do futuro é usar The Force;
+	- Exemplos:
+		- Mapas/navegação:
+			- atualmente tens de pegar num telemóvel, introduzir o endereço e ir com ele na mão se quiseres ver o caminho
+			- no futuro, com AR e cenas no cérebro, basta pensares onde queres ir e tens logo um mapa mental no cérebro
+			- pode-se simular google glass
