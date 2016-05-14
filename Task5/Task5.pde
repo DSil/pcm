@@ -28,7 +28,7 @@ void setup() {
 
 
 void draw() {
-  image(movies[curr_movie], 0, 0, 320, 240);
+  image(movies[curr_movie], 0, 0, width, height);
 
   frame = get(0,0,width,height);
   
@@ -87,12 +87,15 @@ void dissolve(PImage frame) {
     pix.set(random, random);
     step--;
   }
+  image(movies[other_movie], 0, 0, width, height);
+  PImage otherFrame = get(0,0,width,height);
   for(int i = 0; i < pix.size(); i++) {
     random = pix.get(i);
     if(random != null)
-      frame.pixels[random] = movies[other_movie].pixels[random];
+      frame.pixels[random] = otherFrame.pixels[random];
   }
   frame.updatePixels();
+
   image(frame, 0, 0, width, height);
 }
 
@@ -103,7 +106,7 @@ void fadeOut(PImage img, int a) {
   
    for (int i = 0; i < width; i++) {
      for (int j = 0; j < height; j++) { 
-       img.pixels[j*width+i] = color(255, 255, 255, a);   // Reversing y to mirror the image img.pixels[(height - j - 1)*width+i];
+       img.pixels[j*width+i] = color(255, 255, 255, a);  
      }
    } 
    
