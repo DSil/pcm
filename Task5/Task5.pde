@@ -1,10 +1,11 @@
 import processing.video.*;
 Movie movie1, movie2;
-Movie[] movies = {movie1, movie2};
+Movie[] movies = {null, null};
 PImage frame;
 int nframe, numPixels, curr_movie=0, other_movie=1;
-Boolean wipe, fade, fadingOut, fadingIn, cube, ckey;
+Boolean wipe, fade, fadingOut, fadingIn, cube, ckey, dissolving;
 int filter, alpha, wipePixels;
+ArrayList<Integer> pix;
 
 
 void setup() {
@@ -16,10 +17,12 @@ void setup() {
   movies[curr_movie].loop();
   movies[other_movie].play();
   movies[other_movie].loop();
-  
   wipePixels = 0;
-  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false; ckey = false;
-  size(320,240);
+  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false; ckey = false; dissolving = false;
+  size(movie1.width, movie1.height);
+  pix = new ArrayList<Integer>(width*height);
+  for(int i = 0; i < width*height; i++)
+    pix.add(null);
   alpha = 0;
 }
 
@@ -39,11 +42,14 @@ void draw() {
   if(wipe){
    startWipe(); 
   }
+  if(dissolving) {
+    dissolve(frame);
+  }
   if(ckey && curr_movie == 1) {
     chromaKey(frame);
   }
 
-   updatePixels();
+   //updatePixels();
 }
 
 
@@ -51,18 +57,43 @@ void draw() {
 void keyPressed() {
   if(key == 'w')
     wipe = !wipe;
-  if (key == 'a'){
+  else if (key == 'a'){
     changeMovie();
   }
-  if (key == 'f') { fade = !fade; fadingOut = !fadingOut;}
-  if (key == 'c') { cube = !cube; }
-  if (key == 'k') { ckey = !ckey; }
+  else if (key == 'f') { fade = !fade; fadingOut = !fadingOut;}
+  else if (key == 'c') { cube = !cube; }
+  else if (key == 'k') { ckey = !ckey; }
+  else if (key == 'd') { dissolving = !dissolving; }
 }
 
 void movieEvent(Movie m) {
  m.read();
  
 
+}
+
+void dissolve(PImage frame) {
+  Integer random;
+  if(pix.indexOf(null) == -1) {
+    for(int i = 0; i < width*height; i++)
+      pix.set(i, null);
+    dissolving = !dissolving;
+    changeMovie();
+    return;
+  }
+  int step = 1000;
+  while(step != 0) {
+    random = (int) random(pix.size());
+    pix.set(random, random);
+    step--;
+  }
+  for(int i = 0; i < pix.size(); i++) {
+    random = pix.get(i);
+    if(random != null)
+      frame.pixels[random] = movies[other_movie].pixels[random];
+  }
+  frame.updatePixels();
+  image(frame, 0, 0, width, height);
 }
 
 /** ESTE DÁ JEITO*/
@@ -76,7 +107,7 @@ void fadeOut(PImage img, int a) {
      }
    } 
    
-    if(fadingOut == true){
+    if(fadingOut){
       if(a<255){ 
         alpha = alpha + 5;
       }
@@ -86,7 +117,7 @@ void fadeOut(PImage img, int a) {
        changeMovie();
       }
    }
-   else if(fadingIn == true){
+   else if(fadingIn){
       if(a>0){ 
         alpha = alpha - 5;
       }else{
