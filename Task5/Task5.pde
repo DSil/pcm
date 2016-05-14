@@ -3,7 +3,7 @@ Movie movie1, movie2;
 Movie[] movies = {movie1, movie2};
 PImage frame;
 int nframe, numPixels, curr_movie=0, other_movie=1;
-Boolean wipe, fade, fadingOut, fadingIn, cube;
+Boolean wipe, fade, fadingOut, fadingIn, cube, ckey;
 int filter, alpha, wipePixels;
 
 
@@ -18,7 +18,7 @@ void setup() {
   movies[other_movie].loop();
   
   wipePixels = 0;
-  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false;
+  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false; ckey = false;
   size(320,240);
   alpha = 0;
 }
@@ -39,6 +39,9 @@ void draw() {
   if(wipe){
    startWipe(); 
   }
+  if(ckey && curr_movie == 1) {
+    chromaKey(frame);
+  }
 
    updatePixels();
 }
@@ -53,6 +56,7 @@ void keyPressed() {
   }
   if (key == 'f') { fade = !fade; fadingOut = !fadingOut;}
   if (key == 'c') { cube = !cube; }
+  if (key == 'k') { ckey = !ckey; }
 }
 
 void movieEvent(Movie m) {
@@ -95,12 +99,30 @@ void fadeOut(PImage img, int a) {
    
 }
 
+void chromaKey(PImage frame) {
+  int loc;
+  float r,g,b;
+  for (int i = 0; i < width; i++) {
+    for (int j = 0; j < height; j++) {
+      loc = j*width+i;
+      r = red(frame.pixels[loc]);
+      g = green(frame.pixels[loc]);
+      b = blue(frame.pixels[loc]);
+      //println("" + r + " " + g + " " + b);
+      if (g == 255 && r < 252 && b < 252)
+        frame.pixels[loc] = movies[other_movie].pixels[loc];
+    }
+  }
+  frame.updatePixels();
+  image(frame, 0, 0);
+}
+
 void startCube(){
   if(wipePixels <= width){
     image(movies[other_movie], 0, 0, wipePixels, height);
     image(movies[curr_movie], wipePixels, 0, width-wipePixels, height);
     wipePixels++;
-  else{
+  } else{
     wipePixels = 0;
     changeMovie();
     cube = !cube;
