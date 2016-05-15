@@ -3,7 +3,8 @@ Movie movie1, movie2;
 Movie[] movies = {null, null};
 PImage frame;
 int nframe, numPixels, curr_movie=0, other_movie=1;
-Boolean wipe, fade, fadingOut, fadingIn, cube, ckey, dissolving;
+float resizeSize;
+Boolean wipe, fade, fadingOut, fadingIn, cube, ckey, dissolving, resizing;
 int filter, alpha, wipePixels;
 ArrayList<Integer> pix;
 
@@ -18,7 +19,10 @@ void setup() {
   movies[other_movie].play();
   movies[other_movie].loop();
   wipePixels = 0;
-  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false; ckey = false; dissolving = false;
+  resizeSize = 1;
+  wipe = false; fade = false; fadingOut =false; fadingIn = false; cube = false; ckey = false; dissolving = false; resizing=false;
+  
+  
   size(movie1.width, movie1.height);
   pix = new ArrayList<Integer>(width*height);
   for(int i = 0; i < width*height; i++)
@@ -48,6 +52,9 @@ void draw() {
   if(ckey && curr_movie == 1) {
     chromaKey(frame);
   }
+  if(resizing){
+     startResize(); 
+  }
 
    //updatePixels();
 }
@@ -64,6 +71,7 @@ void keyPressed() {
   else if (key == 'c') { cube = !cube; }
   else if (key == 'k') { ckey = !ckey; }
   else if (key == 'd') { dissolving = !dissolving; }
+  else if (key == 'r') { resizing = !resizing; }
 }
 
 void movieEvent(Movie m) {
@@ -179,6 +187,25 @@ void startWipe(){
   
 }
 
+
+void startResize(){
+  if(resizeSize > 20){
+     changeMovie();
+     resizing = !resizing;
+     resizeSize = 1;
+  }else{
+
+    image(movies[other_movie], 0, 0, width, height);
+    image(movies[curr_movie], (width-width/resizeSize)/2, (height-height/resizeSize)/2, width/resizeSize, height/resizeSize);
+    imageMode(CORNER);
+    if(resizeSize>5){
+      resizeSize = resizeSize + 0.5;  
+    }
+    else{
+      resizeSize = resizeSize + 0.05;
+    }
+  }
+}
 void changeMovie(){
  int aux_movie = curr_movie;
  curr_movie = other_movie;
