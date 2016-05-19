@@ -8,3 +8,15 @@ holding-hands.jpg -> https://unsplash.com/photos/DYEpCQUyPXQ
 yodapush.png -> http://a.dilcdn.com/bl/wp-content/uploads/sites/6/2015/06/Yodapush.png
 
 tui_ssw.png -> http://docstore.mik.ua/manuals/hp-ux/en/5992-4826/img/tui_ssw.png
+
+Stephen_Hawking_with_New_Computer.jpg -> https://upload.wikimedia.org/wikipedia/commons/4/4d/Stephen_Hawking_with_New_Computer.jpg
+
+awhCbhLqRceCdjcPQUnn_IMG_0249.jpg -> https://images.unsplash.com/38/awhCbhLqRceCdjcPQUnn_IMG_0249.jpg
+
+photo-1426024025799-8cf58f5df5a4.jpeg -> https://images.unsplash.com/photo-1426024025799-8cf58f5df5a4
+
+HTC_Touch2_used_with_a_stylus.jpg -> https://upload.wikimedia.org/wikipedia/commons/e/e8/HTC_Touch2_used_with_a_stylus.jpg
+
+photos-ios-iphone-safari-history-swipe-gestures.jpg -> https://patrickhlauke.github.io/getting-touchy-presentation/pictures/backgrounds/photos-ios-iphone-safari-history-swipe-gestures.jpg
+
+Apple_Watch-.jpg -> https://upload.wikimedia.org/wikipedia/commons/9/92/Apple_Watch-.jpg
